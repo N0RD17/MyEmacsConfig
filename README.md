@@ -1,4 +1,4 @@
-# MyEmacsConfig
+# Summary
 The Emacs config that I use for when I use Emacs.
 
 # This is MOSTLY C++ BASED, IF NOT ENTIRELY!
