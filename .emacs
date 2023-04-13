@@ -42,6 +42,8 @@
   (add-hook 'before-save-hook #'lsp-organize-imports t t))
 (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
 
+;; ------------End of LSP Mode load--------------------------------
+
 ;; Configure gopls via LSP MODE
 (lsp-register-custom-settings
  '(("gopls.completeUnimported" t t)
