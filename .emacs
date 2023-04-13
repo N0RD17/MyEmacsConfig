@@ -6,6 +6,7 @@
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
+
 ;;Disable splashscreen
 (setq inhibit-startup-screen t)
 
@@ -21,7 +22,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-enabled-themes '(tsdh-dark))
- '(package-selected-packages '(yasnippet company eglot)))
+ '(package-selected-packages '(go-mode yasnippet company eglot)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -29,14 +30,59 @@
  ;; If there is more than one, they won't work right.
  )
 
+;; ---USED LSP MODE for go-mode since Eglot and gopls has issues---
+;; Load LSP Mode in .emacs
+(require 'lsp-mode)
+(add-hook 'go-mode-hook #'lsp-deferred)
+
+;; Set up before-save hooks to format buffer and add/delete imports.
+;; Make sure you don't have other gofmt/goimports hooks enabled.
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+;; Configure gopls via LSP MODE
+(lsp-register-custom-settings
+ '(("gopls.completeUnimported" t t)
+   ("gopls.staticcheck" t t)))
+
+;; Configures project for Go Modules(go mod init)
+(require 'project)
+
+(defun project-find-go-module (dir)
+  (when-let ((root (locate-dominating-file dir "go.mod")))
+    (cons 'go-module root)))
+
+(cl-defmethod project-root ((project (head go-module)))
+  (cdr project))
+
+(add-hook 'project-find-functions #'project-find-go-module)
+
+;; c-c++ - Indentation
 (setq c-default-style '((c++-mode . "ellemtel")))
+
+;; Go-Mode
+(defun my-go-mode-hook ()
+  (setq tab-width 3)
+  (setq indent-line-function 'insert-tab))
+
+(add-hook 'go-mode-hook 'my-go-mode-hook)
+
 
 ;; Makes backups emacs file be saved in .emacs.d/emacs_saves
 (setq backup-directory-alist '(("." . "~/.emacs.d/emacs_saves")))
 
+;; Enables company-mode and set it always in follower sessions
+(require 'company)
+(global-company-mode)
+
 ;; Enables yasnippet
 (require 'yasnippet)
 (yas-global-mode 1)
+
+;; Enables go-mode
+(require 'go-mode)
 
 ;; Enables eglot
 (require 'eglot)
@@ -44,5 +90,6 @@
 (add-hook 'c-mode-hook 'eglot-ensure)
 (add-hook 'c++-mode-hook 'eglot-ensure)
 
-;;Enables company-mode always in follower sessions
-(global-company-mode)
+;; GOPATH/bin for gopls
+(add-to-list 'exec-path "~/go/bin")
+(setq gofmt-command "goimports")
