@@ -64,11 +64,12 @@
 ;; c-c++ - Indentation
 (setq c-default-style '((c++-mode . "ellemtel")))
 
-;; Go-Mode
+;; Go-Mode - Indentation
 (defun my-go-mode-hook ()
   (setq tab-width 3)
   (setq indent-line-function 'insert-tab))
 
+;; Apply the indentation to go-mode
 (add-hook 'go-mode-hook 'my-go-mode-hook)
 
 
