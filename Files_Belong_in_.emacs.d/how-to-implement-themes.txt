@@ -1,0 +1,4 @@
+Copy the .el file onto the themes folder
+
+
+Once there, to load theme type M-x customize-themes ;; now press return
