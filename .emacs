@@ -72,6 +72,8 @@
 ;; Apply the indentation to go-mode
 (add-hook 'go-mode-hook 'my-go-mode-hook)
 
+;; Tells emacs I have installed a themes folder
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 
 ;; Makes backups emacs file be saved in .emacs.d/emacs_saves
 (setq backup-directory-alist '(("." . "~/.emacs.d/emacs_saves")))
