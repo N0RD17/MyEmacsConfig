@@ -63,13 +63,15 @@
 
 ;; c-c++ - Indentation
 (setq c-default-style '((c++-mode . "ellemtel")))
+(setq-default indent-tabs-mode nil)
 
-;; Go-Mode - Indentation
+;; Go-Mode
 (defun my-go-mode-hook ()
-  (setq tab-width 3)
-  (setq indent-line-function 'insert-tab))
 
-;; Apply the indentation to go-mode
+  (setq tab-width 4)
+  (setq standard-indent 2)
+  (setq indent-tabs-mode nil))
+
 (add-hook 'go-mode-hook 'my-go-mode-hook)
 
 ;; Tells emacs I have installed a themes folder
