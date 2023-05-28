@@ -3,7 +3,7 @@ The Emacs config that I use for when I use Emacs.
 
 # PREQUISITE
 You must have Emacs (obviously)<br>
-After pasting my contents onto your .emacs file or downloading it and having it as your .emacs file. Do the following<br>
+After you paste my .emacs contents onto your .emacs file or downloading it and having it as your .emacs file. Do the following<br>
 --If you want C++ support--<br>
 1.Install clangd. You would want to head to their website for guidance on doing so https://clangd.llvm.org/installation<br>
 -- Install the following packages in emacs after refreshing-contents inside your .emacs file --<br>
