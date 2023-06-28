@@ -9,8 +9,8 @@ After you paste my .emacs contents onto your .emacs file or downloading it and h
 --If you want C++ support--
 1.Install clangd. You would want to head to their website for guidance on doing so https://clangd.llvm.org/installation
 
--- Install the following packages in emacs after refreshing-contents inside your .emacs file
-2.Using emacs pack-install(M - x RET package-install RET) install yasnippet, company, lsp-mode, and eglot
+-- Install the following packages in emacs after refreshing-contents inside your .emacs file (M-x <RET> package-refresh-contents <RET>)
+2.Using emacs pack-install(M-x <RET> package-install <RET>) install yasnippet, company, lsp-mode, and eglot
 
 -- If you want golang support--
 
