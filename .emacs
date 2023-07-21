@@ -10,6 +10,9 @@
 ;;Disable splashscreen
 (setq inhibit-startup-screen t)
 
+;; Enable automatic pairing
+(electric-pair-mode 1)
+
 ;; Option if I want to keep or disable menu bar. 1 keeps it.
 (menu-bar-mode 1)
 
