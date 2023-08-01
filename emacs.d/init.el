@@ -203,16 +203,10 @@
                                 (bookmarks . "bookmark")
                                 (projects . "rocket")))
 ;; Set the title
-(setq dashboard-banner-logo-title "Hello good hunter, what is it you desire?")
-
-(setq dashboard-footer-messages '("Hello, good hunter.\n I am a doll, here in this dream to look after you."
-                                  "Over time, countless hunters have visited this dream..."
-                                  "Hunters have told me about the Church, about the Gods and their love.\n But, do the Gods love their creations. I am a doll created by you humans, would you ever think to love me?\n Of course, I do love you, isn't that how you've made me?"
-                                  "I sense the ancient echoes... They course through your veins."
-                                  "O flora, of the moon, of the dream. O little ones, O fleeting will of the ancients.\n Let the hunter be safe, let him find comfort.\n And let this dream, his captor, foretell a pleasant awakening"))
+(setq dashboard-banner-logo-title "Hope you enjoy this Emacs config.")
 
 ;; Set the banner
-(setq dashboard-startup-banner "~/.emacs.d/images/bloodborne/Bloodborne-HunterDream-2-Scaled.png")
+(setq dashboard-startup-banner '2)
 ;; Customize which widgets are displayed
 (setq dashboard-items '((recents . 5)
                         (bookmarks . 5)
