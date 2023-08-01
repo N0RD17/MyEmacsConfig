@@ -4,7 +4,7 @@ The Emacs config that I use for when I use Emacs.
 # PREQUISITE
 ```
 You must have Emacs (obviously)
-After you paste my .emacs contents onto your .emacs file or downloading it and having it as your .emacs file. Do the following
+After you paste my init.el contents onto your .emacs or init.el file or downloading it and having it as your init.el file. Do the following
 
 --If you want C++ support--
 1.Install clangd. You would want to head to their website for guidance on doing so https://clangd.llvm.org/installation
