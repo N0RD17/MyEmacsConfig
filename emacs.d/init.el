@@ -33,7 +33,7 @@
    '("8721f7ee8cd0c2e56d23f757b44c39c249a58c60d33194fe546659dabc69eebd" "5283a0c77cc7640fc28493cfdf8957b11e1c72af846d96f5e5a6a37432264c34" "aae95bbe93015b723d94b7081fdb27610d393c2156e2cda2e43a1ea7624c9e6f" default))
  '(ede-project-directories '("/home/paragon/Desktop/dev_cpp/tmp/myproject"))
  '(package-selected-packages
-   '(projectile all-the-icons doom-modeline dracula-theme gotham-theme 0blayout treemacs dashboard go-mode yasnippet company eglot)))
+   '(projectile all-the-icons doom-modeline dracula-theme gotham-theme treemacs dashboard go-mode yasnippet company eglot)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
