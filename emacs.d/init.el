@@ -72,11 +72,8 @@
 
 (add-hook 'project-find-functions #'project-find-go-module)
 
-;; c-c++ - Indentation
-(setq c-default-style '((c++-mode . "ellemtel")))
-;; Uncomment the line below if using C
-;; The line below overrides c++-mode style to default
-;;(setq c-default-style '((c-mode . "ellemtel")))
+;; c-mode and c++-mode Indentation
+(setq c-default-style '((c-mode . "ellemtel") (c++-mode . "ellemtel")))
 (setq-default indent-tabs-mode nil)
 
 ;; Go-Mode
@@ -230,7 +227,8 @@
 ;; --------------- BEGIN DOOM-MODELINE ---------------
 ;; Enable doom-modeline
 (require 'doom-modeline)
-(doom-modeline-mode )1
+(require 'nerd-icons)
+(doom-modeline-mode 1)
 ;; --------------- END DOOM-MODELINE ---------------
 
 
