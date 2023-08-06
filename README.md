@@ -11,6 +11,7 @@ After you paste my init.el contents onto your .emacs or init.el file or download
 
 -- refresh-contents inside your init.el file (M-x <RET> package-refresh-contents <RET>)
 This package use all-the-icons so once you refresh don't forget to do M-x RET all-the-icons-install-fonts RET
+This package also uses nerd-icons s oonce you refresh don't forget to do M-x RET nerd-icons-install-fonts RET
   
 ```
 # This is MOSTLY C++ BASED, IF NOT ENTIRELY!
