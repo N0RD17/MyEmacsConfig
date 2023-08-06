@@ -14,7 +14,7 @@ This package use all-the-icons so once you refresh don't forget to do M-x RET al
 This package also uses nerd-icons s oonce you refresh don't forget to do M-x RET nerd-icons-install-fonts RET
   
 ```
-# This is MOSTLY C++ BASED, IF NOT ENTIRELY!
+# This is MOSTLY C/C++ BASED, IF NOT ENTIRELY!
 My preferred programming language is C++. So, obviously, this .emacs is based for C++ use.
 
 # UPDATE: Added GoLang go-mode support
