@@ -1,3 +1,4 @@
+;; Sets Melpa Packages
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
@@ -5,35 +6,41 @@
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
+
 ;;Disable splashscreen
 (setq inhibit-startup-screen t)
 
-;; If GUI version of Emacs
+
+;; Only if its GUI do this
 (when window-system
-  (menu-bar-mode 0)	;; Disables menu-bar
-  (tool-bar-mode 0))	;; Disabes tool-bar
+  (tool-bar-mode 0)  ;; Disable the tool-bar
+  (tooltip-mode 0)) ;; Disable the tool-tips
 
-(when (display-graphic-p)
-  (require 'all-the-icons))
+;;
+;; ido management
+;; NOW DISABLED TO PREVENT CONFLICT WITH 'helm'
+;;(setq ido-everywhere t)
+;;(setq ido-enable-flex-matching t)
+;;(ido-mode t)
+;;
 
-;; Ido management
-(setq ido-everywhere t)
-(setq ido-enable-flex-matching t)
-(ido-mode t)
+;; Enable automatic pairing
+(electric-pair-mode 1)
 
-;; Enables ede (Emacs Development Environment)
-(global-ede-mode t)
+;; hide-show sub-mode
+;; initializes hs-minor-mode when emacs detects any program mode hook
+(add-hook 'prog-mode-hook (lambda () (hs-minor-mode 1)))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes '(tronesque))
  '(custom-safe-themes
-   '("8721f7ee8cd0c2e56d23f757b44c39c249a58c60d33194fe546659dabc69eebd" "5283a0c77cc7640fc28493cfdf8957b11e1c72af846d96f5e5a6a37432264c34" "aae95bbe93015b723d94b7081fdb27610d393c2156e2cda2e43a1ea7624c9e6f" default))
- '(ede-project-directories '("/home/paragon/Desktop/dev_cpp/tmp/myproject"))
+   '("aae95bbe93015b723d94b7081fdb27610d393c2156e2cda2e43a1ea7624c9e6f" default))
  '(package-selected-packages
-   '(projectile all-the-icons doom-modeline dracula-theme gotham-theme treemacs dashboard go-mode yasnippet company eglot)))
+   '(sr-speedbar function-args helm-gtags no-littering helm-projectile projectile all-the-icons doom-modeline gotham-theme dashboard go-mode yasnippet company eglot)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -41,10 +48,22 @@
  ;; If there is more than one, they won't work right.
  )
 
+(setq lsp-enable-links nil)
+
+;; -- NO LITERRING TO KEEP /.config/emacs as clean as possible --
+(require 'no-littering)
+
+;; Only when displaying graphics
+(when (display-graphic-p)
+  (require 'all-the-icons))
+
 ;; ---USED LSP MODE for go-mode since Eglot and gopls has issues---
 ;; Load LSP Mode in .emacs
 (require 'lsp-mode)
 (add-hook 'go-mode-hook #'lsp-deferred)
+;; Prevents lsp to add headers automatically
+(setq lsp-clients-clangd-args
+      '("--header-insertion=never"))
 
 ;; Set up before-save hooks to format buffer and add/delete imports.
 ;; Make sure you don't have other gofmt/goimports hooks enabled.
@@ -60,6 +79,9 @@
  '(("gopls.completeUnimported" t t)
    ("gopls.staticcheck" t t)))
 
+(require 'projectile)
+(setq projectile-completion-system 'helm)
+(helm-projectile-on)
 ;; Configures project for Go Modules(go mod init)
 (require 'project)
 
@@ -73,7 +95,7 @@
 (add-hook 'project-find-functions #'project-find-go-module)
 
 ;; c-mode and c++-mode Indentation
-(setq c-default-style '((c-mode . "ellemtel") (c++-mode . "ellemtel")))
+(setq c-default-style '((c++-mode . "ellemtel") (c-mode . "ellemtel")))
 (setq-default indent-tabs-mode nil)
 
 ;; Go-Mode
@@ -89,26 +111,24 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 
 ;; Makes backups emacs file be saved in .emacs.d/emacs_saves
-(setq backup-directory-alist '(("." . "~/.emacs.d/emacs_saves")))
+(setq backup-directory-alist '(("." . "~/.emacs.d/.backup_saves")))
 
-;; ------------------- BEGINNING OF THEMES --------------------
-;; C-x C-e to enable one
-;; Tronesque-theme
+;; Loads the tronesque theme
 ;;(load-theme 'tronesque)
 
-;; gotham-theme
-(load-theme 'gotham)
+;; Load the gotham-theme
+(load-theme 'gotham t)
 
-;; dracula-theme
-;;(load-theme 'dracula)
-
-;; ------------------- END OF THEMES --------------------
 
 ;; Enables company-mode and set it always in follower sessions
 (require 'company)
-(global-company-mode)
+(add-hook 'after-init-hook 'global-company-mode)
+
+
 
 ;; Enables yasnippet
+(add-to-list 'load-path
+              "~/.emacs.d/plugins/yasnippet")
 (require 'yasnippet)
 (yas-global-mode 1)
 
@@ -120,8 +140,13 @@
 (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
 (add-hook 'c-mode-hook 'eglot-ensure)
 (add-hook 'c++-mode-hook 'eglot-ensure)
+;; Stops eglot from automatically inserting headers
+(add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--header-insertion=never")))
 
-;; ----------------- BETTER DEFAULTS  -----------------
+(add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--inlayhints-designators=never")))
+
+
+;; ------------ Better Defaults? ------------
 (setq-default
  ad-redefinition-action 'accept                   ; Silence warnings for redefinition
  auto-window-vscroll nil                          ; Lighten vertical scroll
@@ -140,7 +165,7 @@
  select-enable-clipboard t                        ; Merge system's and Emacs' clipboard
  sentence-end-double-space nil                    ; End a sentence after a dot and a space
  show-help-function nil                           ; Disable help messages
- ;;show-trailing-whitespace t                       ; Display trailing whitespaces
+;; show-trailing-whitespace t                       ; Display trailing whitespaces
  split-height-threshold nil                       ; Disable vertical window splitting
  split-width-threshold nil                        ; Disable horizontal window splitting
  tab-width 4                                      ; Set width for tabs
@@ -158,7 +183,7 @@
  use-default-font-for-symbols nil                 ; Do not use the frame font when rendering emojis
  frame-inhibit-implied-resize nil)                ; Don't ask for confirmation when opening symlinked file
 (cd "~/")                                         ; Move to the user directory
-(global-display-line-numbers-mode t)              ; Enable line numbers globally
+(add-hook 'prog-mode-hook 'display-line-numbers-mode t)              ; Enable line numbers | 'global' removed so only happens when in a programming mode
 (delete-selection-mode 1)                         ; Replace region when inserting text
 (display-time-mode 1)                             ; Enable time in the mode-line
 (global-auto-revert-mode 1)                       ; Automatically revert a buffer when it changes on disk
@@ -172,157 +197,117 @@
 (put 'downcase-region 'disabled nil)              ; Enable downcase-region
 (put 'upcase-region 'disabled nil)                ; Enable upcase-region
 (show-paren-mode 1)                               ; Highlight matching parenthesis
-;; ----------------- END OF BETTER DEFAULTS  -----------------
+(global-hl-line-mode 1)							  ; Highlight the line you're on
+(setq ;; use gdb-many-windows by default
+ gdb-many-windows t
 
-;; ----------------- Some Emacs General Stuff ----------------
+ ;; Non-nil means display source file containing the main routine at startup
+ gdb-show-main t)	;; using gdb this way is meh you need to do additional commands to display gdb-many-windows and stuff
+;; ------------ END OF Better Defaults? ------------
 
-;; Garbage collection on focus-out, Emacs should feel snappier. 
-(add-hook 'focus-out-hook #'garbage-collect)
-
-;; Default to UTF-8 enconding
-(set-default-coding-systems 'utf-8)
-(set-language-environment "UTF-8")
-(prefer-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
-
-;; ----------------- END OF EMACS GENERAL STUFF --------------
-
-;; ----------------- ENABLE DASHBOARD AND ITS CONFIGURATIONS -----------------
+;; ------------ DASHBOARD AND ITS CONFIGURATIONS ------------
 (require 'dashboard)
 (dashboard-setup-startup-hook)
-
-;; Make heading icons enabled
 (setq dashboard-set-heading-icons t)
-;; Use this package for icon type
+;; Use this package
 (setq dashboard-icon-type 'all-the-icons)
-;; Add widgets to display
-(setq dashboard-heading-icons '((recents . "file-text")
+
+(setq dashboard-heading-icons '((recents . "history")
                                 (bookmarks . "bookmark")
                                 (projects . "rocket")))
-;; Set the title
-(setq dashboard-banner-logo-title "Hope you enjoy this Emacs config.")
 
+;; Set the title
+(setq dashboard-banner-logo-title "Welcome to your Emacs Trek")
 ;; Set the banner
-(setq dashboard-startup-banner '2)
-;; Customize which widgets are displayed
+(setq dashboard-startup-banner '3)
+
+;; Add widgets to display
 (setq dashboard-items '((recents . 5)
                         (bookmarks . 5)
                         (projects . 5)))
 
-;; Modify widget heading name
+;; To modify widget heading name
 (setq dashboard-item-names '(("Recent Files:" . "Recently opened files:")))
 
-;; To display the navigator below the banner
+;; Show navigator below the banner
 (setq dashboard-set-navigator t)
 
 ;; Format: "(icon title help action face prefix suffix)"
 (setq dashboard-navigator-buttons
       `(;; line1
         ((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
-         "Github"
+         "Homepage"
          "Browse homepage"
-         (lambda (&rest _) (browse-url "https://github.com/"))))))
-;; ------------ END OF ENABLE DASHBOARD AND ITS CONFIGURATIONS ------------
+         (lambda (&rest _) (browse-url "homepage")))
+        ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
+        ("?" "" "?/h" #'show-help nil "<" ">"))
+         ;; line 2
+        ((,(all-the-icons-faicon "linkedin" :height 1.1 :v-adjust 0.0)
+          "Linkedin"
+          ""
+          (lambda (&rest _) (browse-url "homepage")))
+         ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
 
-;; --------------- BEGIN DOOM-MODELINE ---------------
+
+;; ------------ END OF DASHBOARD AND ITS CONFIGURATIONS ------------
+
+;; ------------ BEGIN DOOM-MODELINE  ------------
 ;; Enable doom-modeline
 (require 'doom-modeline)
+(add-hook 'after-init-hook 'doom-modeline-mode)
 (require 'nerd-icons)
-(doom-modeline-mode 1)
-;; --------------- END DOOM-MODELINE ---------------
+;;(doom-modeline-mode 1) ;; I prefer initializing after init
+
+;; ------------ BEGIN sr-speedbar STUFF ------------
+
+(setq speedbar-show-unknown-files t)
+
+;; ------------ END OF sr-speedbar STUFF ------------
+
+;; ------------ START OF HELM ------------
+
+(require 'helm)
+(require 'function-args)
+(fa-config-default)
 
 
-;;--------------- BEGINNING OF TREEMACS ---------------
-(use-package treemacs
-  :ensure t
-  :defer t
-  :init
-  (with-eval-after-load 'winum
-    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-  :config
-  (progn
-    (setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
-          treemacs-deferred-git-apply-delay        0.5
-          treemacs-directory-name-transformer      #'identity
-          treemacs-display-in-side-window          t
-          treemacs-eldoc-display                   'simple
-          treemacs-file-event-delay                2000
-          treemacs-file-extension-regex            treemacs-last-period-regex-value
-          treemacs-file-follow-delay               0.2
-          treemacs-file-name-transformer           #'identity
-          treemacs-follow-after-init               t
-          treemacs-expand-after-init               t
-          treemacs-find-workspace-method           'find-for-file-or-pick-first
-          treemacs-git-command-pipe                ""
-          treemacs-goto-tag-strategy               'refetch-index
-          treemacs-header-scroll-indicators        '(nil . "^^^^^^")
-          treemacs-hide-dot-git-directory          t
-          treemacs-indentation                     2
-          treemacs-indentation-string              " "
-          treemacs-is-never-other-window           nil
-          treemacs-max-git-entries                 5000
-          treemacs-missing-project-action          'ask
-          treemacs-move-forward-on-expand          nil
-          treemacs-no-png-images                   nil
-          treemacs-no-delete-other-windows         t
-          treemacs-project-follow-cleanup          nil
-          treemacs-persist-file                    (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-          treemacs-position                        'left
-          treemacs-read-string-input               'from-child-frame
-          treemacs-recenter-distance               0.1
-          treemacs-recenter-after-file-follow      nil
-          treemacs-recenter-after-tag-follow       nil
-          treemacs-recenter-after-project-jump     'always
-          treemacs-recenter-after-project-expand   'on-distance
-          treemacs-litter-directories              '("/node_modules" "/.venv" "/.cask")
-          treemacs-project-follow-into-home        nil
-          treemacs-show-cursor                     nil
-          treemacs-show-hidden-files               t
-          treemacs-silent-filewatch                nil
-          treemacs-silent-refresh                  nil
-          treemacs-sorting                         'alphabetic-asc
-          treemacs-select-when-already-in-treemacs 'move-back
-          treemacs-space-between-root-nodes        t
-          treemacs-tag-follow-cleanup              t
-          treemacs-tag-follow-delay                1.5
-          treemacs-text-scale                      nil
-          treemacs-user-mode-line-format           nil
-          treemacs-user-header-line-format         nil
-          treemacs-wide-toggle-width               70
-          treemacs-width                           35
-          treemacs-width-increment                 1
-          treemacs-width-is-initially-locked       t
-          treemacs-workspace-switch-cleanup        nil)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+(global-set-key (kbd "M-x") 'helm-M-x)
 
-    ;; The default width and height of the icons is 22 pixels. If you are
-    ;; using a Hi-DPI display, uncomment this to double the icon size.
-    ;;(treemacs-resize-icons 44)
+(setq
+ helm-gtags-ignore-case t
+ helm-gtags-auto-update t
+ helm-gtags-use-input-at-cursor t
+ helm-gtags-pulse-at-cursor t
+ helm-gtags-prefix-key "\C-cg"
+ helm-gtags-suggested-key-mapping t
+ )
 
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode 'always)
-    (when treemacs-python-executable
-      (treemacs-git-commit-diff-mode t))
+(require 'helm-gtags)
+;; Enable helm-gtags-mode
+(add-hook 'dired-mode-hook 'helm-gtags-mode)
+(add-hook 'eshell-mode-hook 'helm-gtags-mode)
+(add-hook 'c-mode-hook 'helm-gtags-mode)
+(add-hook 'c++-mode-hook 'helm-gtags-mode)
+(add-hook 'asm-mode-hook 'helm-gtags-mode)
 
-    (pcase (cons (not (null (executable-find "git")))
-                 (not (null treemacs-python-executable)))
-      (`(t . t)
-       (treemacs-git-mode 'deferred))
-      (`(t . _)
-       (treemacs-git-mode 'simple)))
+(define-key helm-gtags-mode-map (kbd "C-c g s") 'helm-gtags-find-symbol)
+(define-key helm-gtags-mode-map (kbd "C-c g r") 'helm-gtags-find-rtag)
+(define-key helm-gtags-mode-map (kbd "C-c g f") 'helm-gtags-find-files)
+(define-key helm-gtags-mode-map (kbd "C-c g c") 'helm-gtags-create-tags)
+(define-key helm-gtags-mode-map (kbd "C-c g u") 'helm-gtags-update-tags)
 
-    (treemacs-hide-gitignored-files-mode nil))
-  :bind
-  (:map global-map
-        ("M-0"       . treemacs-select-window)
-        ("C-x t 1"   . treemacs-delete-other-windows)
-        ("C-x t t"   . treemacs)
-        ("C-x t d"   . treemacs-select-directory)
-        ("C-x t B"   . treemacs-bookmark)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
-;; --------------- END OF TREEMACS ---------------
+(define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-tags-in-this-function)
+(define-key helm-gtags-mode-map (kbd "C-j") 'helm-gtags-select)
+(define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
+(define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
+(define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
+(define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
 
+(setq-local imenu-create-index-function #'moo-jump-local)
+
+(helm-mode 1)
+;; ------------ END OF HELM ------------
 
 ;; GOPATH/bin for gopls
 (add-to-list 'exec-path "~/go/bin")
