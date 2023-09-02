@@ -7,40 +7,13 @@
 (package-initialize)
 
 
-;;Disable splashscreen
-(setq inhibit-startup-screen t)
-
-
-;; Only if its GUI do this
-(when window-system
-  (tool-bar-mode 0)  ;; Disable the tool-bar
-  (tooltip-mode 0)) ;; Disable the tool-tips
-
-;;
-;; ido management
-;; NOW DISABLED TO PREVENT CONFLICT WITH 'helm'
-;;(setq ido-everywhere t)
-;;(setq ido-enable-flex-matching t)
-;;(ido-mode t)
-;;
-
-;; Enable automatic pairing
-(electric-pair-mode 1)
-
-;; hide-show sub-mode
-;; initializes hs-minor-mode when emacs detects any program mode hook
-(add-hook 'prog-mode-hook (lambda () (hs-minor-mode 1)))
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(tronesque))
- '(custom-safe-themes
-   '("aae95bbe93015b723d94b7081fdb27610d393c2156e2cda2e43a1ea7624c9e6f" default))
  '(package-selected-packages
-   '(sr-speedbar function-args helm-gtags no-littering helm-projectile projectile all-the-icons doom-modeline gotham-theme dashboard go-mode yasnippet company eglot)))
+   '(helm-gtags function-args no-littering helm-projectile doom-modeline projectile gotham-theme all-the-icons dashboard yasnippet company)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -48,103 +21,55 @@
  ;; If there is more than one, they won't work right.
  )
 
-(setq lsp-enable-links nil)
 
-;; -- NO LITERRING TO KEEP /.config/emacs as clean as possible --
-(require 'no-littering)
+;; Only if its GUI do this
+(when window-system
+  (tool-bar-mode 0)	;; Disable the tool-bar
+  (tooltip-mode 0))	;; Disable the tool-tips
 
 ;; Only when displaying graphics
 (when (display-graphic-p)
   (require 'all-the-icons))
 
-;; ---USED LSP MODE for go-mode since Eglot and gopls has issues---
-;; Load LSP Mode in .emacs
-(require 'lsp-mode)
-(add-hook 'go-mode-hook #'lsp-deferred)
-;; Prevents lsp to add headers automatically
-(setq lsp-clients-clangd-args
-      '("--header-insertion=never"))
-
-;; Set up before-save hooks to format buffer and add/delete imports.
-;; Make sure you don't have other gofmt/goimports hooks enabled.
-(defun lsp-go-install-save-hooks ()
-  (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t))
-(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
-
-;; ------------End of LSP Mode load--------------------------------
-
-;; Configure gopls via LSP MODE
-(lsp-register-custom-settings
- '(("gopls.completeUnimported" t t)
-   ("gopls.staticcheck" t t)))
-
 (require 'projectile)
 (setq projectile-completion-system 'helm)
 (helm-projectile-on)
-;; Configures project for Go Modules(go mod init)
-(require 'project)
 
-(defun project-find-go-module (dir)
-  (when-let ((root (locate-dominating-file dir "go.mod")))
-    (cons 'go-module root)))
+;; hide-show sub-mode
+;; initializes hs-minor-mode when emacs detects any program mode hook
+(add-hook 'prog-mode-hook (lambda () (hs-minor-mode 1)))
 
-(cl-defmethod project-root ((project (head go-module)))
-  (cdr project))
+;; Makes backups emacs file be saved in .emacs.d/emacs_saves
+(setq backup-directory-alist '(("." . "~/.emacs.d/.backup_saves")))
 
-(add-hook 'project-find-functions #'project-find-go-module)
+
+;; Load gotham-theme
+(load-theme 'gotham t)
+
+;; Enables company
+(require 'company)
+(add-hook 'after-init-hook 'global-company-mode)
+
+;; Enables yasnippet
+(require 'yasnippet)
+(yas-global-mode 1)
 
 ;; c-mode and c++-mode Indentation
 (setq c-default-style '((c++-mode . "ellemtel") (c-mode . "ellemtel")))
 (setq-default indent-tabs-mode nil)
 
-;; Go-Mode
-(defun my-go-mode-hook ()
-
-  (setq tab-width 4)
-  (setq standard-indent 2)
-  (setq indent-tabs-mode nil))
-
-(add-hook 'go-mode-hook 'my-go-mode-hook)
-
-;; Tells emacs I have installed a themes folder
-(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-
-;; Makes backups emacs file be saved in .emacs.d/emacs_saves
-(setq backup-directory-alist '(("." . "~/.emacs.d/.backup_saves")))
-
-;; Loads the tronesque theme
-;;(load-theme 'tronesque)
-
-;; Load the gotham-theme
-(load-theme 'gotham t)
-
-
-;; Enables company-mode and set it always in follower sessions
-(require 'company)
-(add-hook 'after-init-hook 'global-company-mode)
-
-
-
-;; Enables yasnippet
-(add-to-list 'load-path
-              "~/.emacs.d/plugins/yasnippet")
-(require 'yasnippet)
-(yas-global-mode 1)
-
-;; Enables go-mode
-(require 'go-mode)
-
-;; Enables eglot
 (require 'eglot)
 (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
 (add-hook 'c-mode-hook 'eglot-ensure)
 (add-hook 'c++-mode-hook 'eglot-ensure)
+
 ;; Stops eglot from automatically inserting headers
 (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--header-insertion=never")))
 
-(add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--inlayhints-designators=never")))
-
+;; Disabled since it caused eglot to die
+;; Stops clangd from displaying array indexes
+;;(add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--inlayhints-designators=never")))
+;;
 
 ;; ------------ Better Defaults? ------------
 (setq-default
@@ -198,11 +123,6 @@
 (put 'upcase-region 'disabled nil)                ; Enable upcase-region
 (show-paren-mode 1)                               ; Highlight matching parenthesis
 (global-hl-line-mode 1)							  ; Highlight the line you're on
-(setq ;; use gdb-many-windows by default
- gdb-many-windows t
-
- ;; Non-nil means display source file containing the main routine at startup
- gdb-show-main t)	;; using gdb this way is meh you need to do additional commands to display gdb-many-windows and stuff
 ;; ------------ END OF Better Defaults? ------------
 
 ;; ------------ DASHBOARD AND ITS CONFIGURATIONS ------------
@@ -251,18 +171,15 @@
 
 ;; ------------ END OF DASHBOARD AND ITS CONFIGURATIONS ------------
 
-;; ------------ BEGIN DOOM-MODELINE  ------------
+
+;; ------------ BEGIN DOOM-MODELINE ------------
 ;; Enable doom-modeline
 (require 'doom-modeline)
 (add-hook 'after-init-hook 'doom-modeline-mode)
 (require 'nerd-icons)
 ;;(doom-modeline-mode 1) ;; I prefer initializing after init
 
-;; ------------ BEGIN sr-speedbar STUFF ------------
-
-(setq speedbar-show-unknown-files t)
-
-;; ------------ END OF sr-speedbar STUFF ------------
+;; ------------ END OF DOOM-MODELINE ------------
 
 ;; ------------ START OF HELM ------------
 
@@ -308,7 +225,3 @@
 
 (helm-mode 1)
 ;; ------------ END OF HELM ------------
-
-;; GOPATH/bin for gopls
-(add-to-list 'exec-path "~/go/bin")
-(setq gofmt-command "goimports")
