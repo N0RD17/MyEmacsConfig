@@ -71,6 +71,23 @@
 ;;(add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--inlayhints-designators=never")))
 ;;
 
+
+;; ------------ BEGINNING ASM MODE ------------
+
+;; This basically fixes some of the weirdness in assembly
+(defun my-asm-mode-hook()
+  ;; You can use 'comment-dwim' (M-;) for this kind of behavior anyway
+  (local-unset-key (vector asm-comment-char))
+
+  ; Stops indenting on <RET>
+  (electric-indent-local-mode 0))
+
+
+
+(add-hook 'asm-mode-hook 'my-asm-mode-hook)
+
+;; ------------ END OF ASM MODE ------------
+
 ;; ------------ Better Defaults? ------------
 (setq-default
  ad-redefinition-action 'accept                   ; Silence warnings for redefinition
