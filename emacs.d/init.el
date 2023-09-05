@@ -140,6 +140,7 @@
 (put 'upcase-region 'disabled nil)                ; Enable upcase-region
 (show-paren-mode 1)                               ; Highlight matching parenthesis
 (global-hl-line-mode 1)                           ; Highlight the line you're on
+
 ;; ------------ END OF Better Defaults ------------
 
 ;; ------------ DASHBOARD AND ITS CONFIGURATIONS ------------
