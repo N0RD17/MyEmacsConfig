@@ -88,7 +88,7 @@
 
 ;; ------------ END OF ASM MODE ------------
 
-;; ------------ Better Defaults? ------------
+;; ------------ Better Defaults ------------
 (setq-default
  ad-redefinition-action 'accept                   ; Silence warnings for redefinition
  auto-window-vscroll nil                          ; Lighten vertical scroll
@@ -140,7 +140,7 @@
 (put 'upcase-region 'disabled nil)                ; Enable upcase-region
 (show-paren-mode 1)                               ; Highlight matching parenthesis
 (global-hl-line-mode 1)							  ; Highlight the line you're on
-;; ------------ END OF Better Defaults? ------------
+;; ------------ END OF Better Defaults ------------
 
 ;; ------------ DASHBOARD AND ITS CONFIGURATIONS ------------
 (require 'dashboard)
