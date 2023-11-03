@@ -6,21 +6,22 @@
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("5283a0c77cc7640fc28493cfdf8957b11e1c72af846d96f5e5a6a37432264c34" default))
  '(package-selected-packages
-   '(helm-gtags function-args no-littering helm-projectile doom-modeline projectile gotham-theme all-the-icons dashboard yasnippet company)))
+   '(lsp-pyright lsp-mode helm-gtags function-args no-littering helm-projectile doom-modeline projectile gotham-theme all-the-icons dashboard yasnippet company)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
-
+ '(line-number-current-line ((t (:inherit line-number :foreground "cyan3" :weight bold))))
+ '(vertical-border ((t nil))))
 
 ;; Only if its GUI do this
 (when window-system
@@ -71,6 +72,19 @@
 ;;(add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--inlayhints-designators=never")))
 ;;
 
+;; ------------ BEGINNING PYTHON MODE ------------
+
+(require 'lsp-mode)
+(use-package lsp-pyright
+  :ensure t
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-pyright)
+                         (lsp))))
+
+(setq lsp-pyright-venv-directory '"~/.virtualenvs/python_env")
+(setq lsp-pyright-venv-path		 '"~/.virtualenvs/python_env")
+
+;; ------------ END OF PYTHON MODE ------------
 
 ;; ------------ BEGINNING ASM MODE ------------
 
@@ -81,8 +95,6 @@
 
   ; Stops indenting on <RET>
   (electric-indent-local-mode 0))
-
-
 
 (add-hook 'asm-mode-hook 'my-asm-mode-hook)
 
@@ -120,7 +132,7 @@
  inhibit-compacting-font-caches t                 ; Faster navigation point (costs more memory)
  recentf-mode t                                   ; Keep recent files
  make-backup-files nil                            ; Stop creating backup files
-;; display-line-numbers-type 'relative              ; Use relative line numbers
+ display-line-numbers-type 'relative              ; Use relative line numbers
  vc-follow-symlinks t                             ; When the symlink points to a version-controlled file
  use-default-font-for-symbols nil                 ; Do not use the frame font when rendering emojis
  frame-inhibit-implied-resize nil)                ; Don't ask for confirmation when opening symlinked file
@@ -141,6 +153,9 @@
 (show-paren-mode 1)                               ; Highlight matching parenthesis
 (global-hl-line-mode 1)                           ; Highlight the line you're on
 
+
+
+
 ;; ------------ END OF Better Defaults ------------
 
 ;; ------------ DASHBOARD AND ITS CONFIGURATIONS ------------
@@ -155,7 +170,7 @@
                                 (projects . "rocket")))
 
 ;; Set the title
-(setq dashboard-banner-logo-title "Welcome to your Emacs Trek")
+(setq dashboard-banner-logo-title "Hello, Good Hunter, what is it you desire?")
 ;; Set the banner
 (setq dashboard-startup-banner '3)
 
@@ -176,16 +191,7 @@
         ((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
          "Homepage"
          "Browse homepage"
-         (lambda (&rest _) (browse-url "homepage")))
-        ("★" "Star" "Show stars" (lambda (&rest _) (show-stars)) warning)
-        ("?" "" "?/h" #'show-help nil "<" ">"))
-         ;; line 2
-        ((,(all-the-icons-faicon "linkedin" :height 1.1 :v-adjust 0.0)
-          "Linkedin"
-          ""
-          (lambda (&rest _) (browse-url "homepage")))
-         ("⚑" nil "Show flags" (lambda (&rest _) (message "flag")) error))))
-
+         (lambda (&rest _) (browse-url "github.com"))))))
 
 ;; ------------ END OF DASHBOARD AND ITS CONFIGURATIONS ------------
 
@@ -243,3 +249,5 @@
 
 (helm-mode 1)
 ;; ------------ END OF HELM ------------
+
+
