@@ -14,7 +14,7 @@
  '(custom-safe-themes
    '("5283a0c77cc7640fc28493cfdf8957b11e1c72af846d96f5e5a6a37432264c34" default))
  '(package-selected-packages
-   '(lsp-pyright lsp-mode helm-gtags function-args no-littering helm-projectile doom-modeline projectile gotham-theme all-the-icons dashboard yasnippet company)))
+   '(treemacs-magit treemacs-nerd-icons treemacs-projectile treemacs lsp-pyright lsp-mode helm-gtags function-args no-littering helm-projectile doom-modeline projectile gotham-theme all-the-icons dashboard yasnippet company)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -29,8 +29,10 @@
   (tooltip-mode 0))	;; Disable the tool-tips
 
 ;; Only when displaying graphics
-(when (display-graphic-p)
-  (require 'all-the-icons))
+;;(when (display-graphic-p)
+;;  (require 'all-the-icons))
+;; Let it be applied even on terminal mode
+(require 'all-the-icons)
 
 (require 'projectile)
 (setq projectile-completion-system 'helm)
@@ -170,9 +172,27 @@
                                 (projects . "rocket")))
 
 ;; Set the title
-(setq dashboard-banner-logo-title "Hello, Good Hunter, what is it you desire?")
+(setq dashboard-banner-logo-title "Hello, good hunter, what is it you desire?")
+
 ;; Set the banner
-(setq dashboard-startup-banner '3)
+(setq dashboard-startup-banner "~/.emacs.d/images/bloodborne/Bloodborne-HunterDream-2-Scaled.png")
+
+(setq dashboard-footer-messages '("I am a doll, here in this dream to look after you."
+                                  "Honorable hunter, pursue the echoes of blood
+and I will channel them into your strength."
+                                  "You will hunt beasts and I will be here for you,
+to embolden your sickly spirit."
+                                  "Over time, countless hunters have visited this dream.
+The graves here stand in their memory... it all seems, so long ago now."
+                                  "Hunters have told me about the Church,
+about the Gods and their love. But do Gods love their creations.
+I am a doll created by you humans, would you ever think to love me?
+Of course, I do love you, isn't that how you've made me?"
+                                  "O flora, of the moon, of the dream. O little ones, O fleeting will of the ancients.
+Let the hunter be safe, let them find comfort. And let this dream, their captor,
+foretell a pleasant awakening. Be one day, a fond, distant memory."))
+
+
 
 ;; Add widgets to display
 (setq dashboard-items '((recents . 5)
@@ -250,4 +270,9 @@
 (helm-mode 1)
 ;; ------------ END OF HELM ------------
 
-
+;; ------------ START OF TREEMACS ------------
+;; Treemacs, Treemacs-Projectile, Treemacs-Magit, Treemacs-nerds-icons
+(require 'treemacs)
+(require 'treemacs-projectile)
+(require 'treemacs-magit-autoloads)
+(require 'treemacs-nerd-icons-autoloads)
