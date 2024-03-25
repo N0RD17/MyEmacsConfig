@@ -6,12 +6,12 @@ The Emacs config that I use for when I use Emacs.
 You must have Emacs (obviously)
 After you paste my init.el contents onto your .emacs or init.el file or downloading it and having it as your init.el file. Do the following
 
--- refresh-contents inside your init.el file (M-x <RET> package-refresh-contents <RET>)
-If that does not prompt the install then do M-x <RET> package-install-selected-packages <RET>
-This package use all-the-icons so once you refresh don't forget to do
-M-x <RET> all-the-icons-install-fonts <RET>
-This package also uses nerd-icons so once you refresh don't forget to do
-M-x <RET> nerd-icons-install-fonts <RET>
+1.  refresh-contents inside your init.el file (M-x <RET> package-refresh-contents <RET>)
+1.5 If that does not prompt the install then do M-x <RET> package-install-selected-packages <RET>
+-- This package use all-the-icons so once you refresh don't forget to do
+2. M-x <RET> all-the-icons-install-fonts <RET>
+-- This package also uses nerd-icons so once you refresh don't forget to do
+3. M-x <RET> nerd-icons-install-fonts <RET>
 ```
 # LSP/EGLOT FUNCTIONALITY
 My preferred language is C/C++, however, I do like to use Python and I want to learn Java.<br>
