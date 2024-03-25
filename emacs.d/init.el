@@ -1,4 +1,3 @@
-;; Sets Melpa Packages
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
@@ -6,101 +5,32 @@
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("5283a0c77cc7640fc28493cfdf8957b11e1c72af846d96f5e5a6a37432264c34" default))
  '(package-selected-packages
-   '(treemacs-magit treemacs-nerd-icons treemacs-projectile treemacs lsp-pyright lsp-mode helm-gtags function-args no-littering helm-projectile doom-modeline projectile gotham-theme all-the-icons dashboard yasnippet company)))
+   '(vterm eglot emms company-jedi lsp-jedi lsp-ui lsp-java lsp-mode spacemacs-theme dashboard treemacs-nerd-icons treemacs-magit treemacs-projectile treemacs org-bullets flycheck-projectile counsel-projectile projectile nerd-icons-ivy-rich all-the-icons ivy-rich doom-modeline ivy yasnippet company)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(line-number-current-line ((t (:inherit line-number :foreground "cyan3" :weight bold))))
- '(vertical-border ((t nil))))
+ )
 
 ;; Only if its GUI do this
 (when window-system
   (tool-bar-mode 0)	;; Disable the tool-bar
   (tooltip-mode 0))	;; Disable the tool-tips
 
-;; Only when displaying graphics
-;;(when (display-graphic-p)
-;;  (require 'all-the-icons))
-;; Let it be applied even on terminal mode
-(require 'all-the-icons)
-
-(require 'projectile)
-(setq projectile-completion-system 'helm)
-(helm-projectile-on)
-
 ;; hide-show sub-mode
-;; initializes hs-minor-mode when emacs detects any program mode hook
+;; Initializes hs-minor-mode when emacs detects any program mode hook
 (add-hook 'prog-mode-hook (lambda () (hs-minor-mode 1)))
 
 ;; Makes backups emacs file be saved in .emacs.d/emacs_saves
 (setq backup-directory-alist '(("." . "~/.emacs.d/.backup_saves")))
-
-
-;; Load gotham-theme
-(load-theme 'gotham t)
-
-;; Enables company
-(require 'company)
-(add-hook 'after-init-hook 'global-company-mode)
-
-;; Enables yasnippet
-(require 'yasnippet)
-(yas-global-mode 1)
-
-;; c-mode and c++-mode Indentation
-(setq c-default-style '((c++-mode . "ellemtel") (c-mode . "ellemtel")))
-(setq-default indent-tabs-mode nil)
-
-(require 'eglot)
-(add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
-(add-hook 'c-mode-hook 'eglot-ensure)
-(add-hook 'c++-mode-hook 'eglot-ensure)
-
-;; Stops eglot from automatically inserting headers
-(add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--header-insertion=never")))
-
-;; Disabled since it caused eglot to die
-;; Stops clangd from displaying array indexes
-;;(add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--inlayhints-designators=never")))
-;;
-
-;; ------------ BEGINNING PYTHON MODE ------------
-
-(require 'lsp-mode)
-(use-package lsp-pyright
-  :ensure t
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-pyright)
-                         (lsp))))
-
-(setq lsp-pyright-venv-directory '"~/.virtualenvs/python_env")
-(setq lsp-pyright-venv-path		 '"~/.virtualenvs/python_env")
-
-;; ------------ END OF PYTHON MODE ------------
-
-;; ------------ BEGINNING ASM MODE ------------
-
-;; This basically fixes some of the weirdness in assembly
-(defun my-asm-mode-hook()
-  ;; You can use 'comment-dwim' (M-;) for this kind of behavior anyway
-  (local-unset-key (vector asm-comment-char))
-
-  ; Stops indenting on <RET>
-  (electric-indent-local-mode 0))
-
-(add-hook 'asm-mode-hook 'my-asm-mode-hook)
-
-;; ------------ END OF ASM MODE ------------
 
 ;; ------------ Better Defaults ------------
 (setq-default
@@ -124,7 +54,7 @@
 ;; show-trailing-whitespace t                       ; Display trailing whitespaces
  split-height-threshold nil                       ; Disable vertical window splitting
  split-width-threshold nil                        ; Disable horizontal window splitting
- tab-width 4                                      ; Set width for tabs
+;; tab-width 4                                      ; Set width for tabs
  uniquify-buffer-name-style 'forward              ; Uniquify buffer names
  window-combination-resize t                      ; Resize windows proportionally
  x-stretch-cursor t                               ; Stretch cursor to the glyph width
@@ -157,8 +87,17 @@
 
 
 
-
 ;; ------------ END OF Better Defaults ------------
+
+;; Loads spacemacs theme
+(load-theme 'spacemacs-dark t)
+
+;; ------------ START OF ICONS ------------
+
+(require 'all-the-icons)
+(require 'nerd-icons)
+
+;; ------------ END OF ICONS ------------
 
 ;; ------------ DASHBOARD AND ITS CONFIGURATIONS ------------
 (require 'dashboard)
@@ -216,63 +155,147 @@ foretell a pleasant awakening. Be one day, a fond, distant memory."))
 ;; ------------ END OF DASHBOARD AND ITS CONFIGURATIONS ------------
 
 
+(require 'company)
+(add-hook 'after-init-hook 'global-company-mode)
+
+;; Enables yasnippet
+(require 'yasnippet)
+(yas-global-mode 1)
+
+;; c-mode and c++-mode Indentation
+(setq c-default-style '((c++-mode . "ellemtel") (c-mode . "ellemtel")))
+(setq-default indent-tabs-mode nil)
+
+(require 'eglot)
+(with-eval-after-load 'eglot
+  (require 'flycheck)
+  (require 'flycheck-projectile)
+  (require 'flycheck-eglot)
+  (global-flycheck-eglot-mode 1))
+  
+
+;; ------------ START OF C-C++ MODE THINGS ------------
+
+;; c-mode and c++-mode Indentation
+(setq c-default-style '((c++-mode . "ellemtel") (c-mode . "ellemtel")))
+(setq-default indent-tabs-mode nil)
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  (add-hook 'c-mode-hook 'eglot-ensure)
+  (add-hook 'c++-mode-hook 'eglot-ensure)
+  ;; Stops eglot form automatically inserting headers
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--header-insertion=never"))))
+
+;; ------------ END OF C-C++ MODE THINGS ------------
+
+;; ------------ START OF JAVA MODE THINGS ------------
+
+(require 'lsp-mode)
+(with-eval-after-load 'lsp-mode
+  (add-hook 'java-mode-hook 'lsp)
+  (setq lsp-ui-doc-show-with-cursor t))
+
+;; ------------ END OF JAVA MODE THINGS ------------
+
+;; ------------ START OF PYTHON MODE THINGS ------------
+(require 'lsp-jedi)
+(require 'company-jedi)
+(with-eval-after-load 'lsp-mode
+  (add-hook 'python-mode-hook 'lsp)
+  (setq lsp-ui-doc-show-with-cursor t))
+;; ------------ END OF PYTHON MODE THINGS ------------
+
 ;; ------------ BEGIN DOOM-MODELINE ------------
 ;; Enable doom-modeline
 (require 'doom-modeline)
 (add-hook 'after-init-hook 'doom-modeline-mode)
-(require 'nerd-icons)
 ;;(doom-modeline-mode 1) ;; I prefer initializing after init
 
 ;; ------------ END OF DOOM-MODELINE ------------
 
-;; ------------ START OF HELM ------------
+;; ------------ START OF ORG-STUFF ------------
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
-(require 'helm)
-(require 'function-args)
-(fa-config-default)
+;; ------------ END OF ORG-STUFF ------------
+
+;; ------------ START OF IVY ------------
+(require 'ivy)
+;; Prevents the recentf warnings and errors
+(require 'recentf)
+(recentf-mode 1)
+(require 'projectile)
+(with-eval-after-load 'ivy
+  (require 'counsel)
+  (require 'counsel-projectile)
+  (ivy-mode 1)
+  (setq projectile-completion-system 'ivy)
+  (counsel-projectile-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq enable-recursive-minibuffers t)
+  (global-set-key "\C-s" 'swiper)
+  (global-set-key (kbd "C-c C-r") 'ivy-resume)
+  (global-set-key (kbd "<f6>") 'ivy-resume)
+  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+  (global-set-key (kbd "<f1> o") 'counsel-describe-symbol)
+  (global-set-key (kbd "<f1> l") 'counsel-find-library)
+  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+  (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+  (global-set-key (kbd "C-c g") 'counsel-git)
+  (global-set-key (kbd "C-c j") 'counsel-git-grep)
+  (global-set-key (kbd "C-c k") 'counsel-ag)
+  (global-set-key (kbd "C-x l") 'counsel-locate)
+  (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
 
 
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
-(global-set-key (kbd "M-x") 'helm-M-x)
+;; Ivy-Rich
+;; Enables nerd-icons before ivy-rich-mode for better performance
+;; Enable other packages like counsel-projectile before enabling
+;; nerd-icons-ivy-rich-mode
+(require 'nerd-icons-ivy-rich)
+(require 'ivy-rich)
+(nerd-icons-ivy-rich-mode 1)
+(ivy-rich-mode 1)
+(setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
 
-(setq
- helm-gtags-ignore-case t
- helm-gtags-auto-update t
- helm-gtags-use-input-at-cursor t
- helm-gtags-pulse-at-cursor t
- helm-gtags-prefix-key "\C-cg"
- helm-gtags-suggested-key-mapping t
- )
-
-(require 'helm-gtags)
-;; Enable helm-gtags-mode
-(add-hook 'dired-mode-hook 'helm-gtags-mode)
-(add-hook 'eshell-mode-hook 'helm-gtags-mode)
-(add-hook 'c-mode-hook 'helm-gtags-mode)
-(add-hook 'c++-mode-hook 'helm-gtags-mode)
-(add-hook 'asm-mode-hook 'helm-gtags-mode)
-
-(define-key helm-gtags-mode-map (kbd "C-c g s") 'helm-gtags-find-symbol)
-(define-key helm-gtags-mode-map (kbd "C-c g r") 'helm-gtags-find-rtag)
-(define-key helm-gtags-mode-map (kbd "C-c g f") 'helm-gtags-find-files)
-(define-key helm-gtags-mode-map (kbd "C-c g c") 'helm-gtags-create-tags)
-(define-key helm-gtags-mode-map (kbd "C-c g u") 'helm-gtags-update-tags)
-
-(define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-tags-in-this-function)
-(define-key helm-gtags-mode-map (kbd "C-j") 'helm-gtags-select)
-(define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
-(define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
-(define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
-(define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
-
-(setq-local imenu-create-index-function #'moo-jump-local)
-
-(helm-mode 1)
-;; ------------ END OF HELM ------------
+;; ------------ END OF IVY ------------
 
 ;; ------------ START OF TREEMACS ------------
 ;; Treemacs, Treemacs-Projectile, Treemacs-Magit, Treemacs-nerds-icons
 (require 'treemacs)
 (require 'treemacs-projectile)
-(require 'treemacs-magit-autoloads)
-(require 'treemacs-nerd-icons-autoloads)
+(require 'treemacs-magit)
+(require 'treemacs-nerd-icons)
+;; ------------ END OF TREEMACS ------------
+
+;; ------------ START OF ACE-WINDOW ------------
+;; TREEMACS comes with Ace-Window preinstalled as a depedency!
+(require 'ace-window)
+
+(global-set-key (kbd "C-x o") 'ace-window)
+
+;; ------------ END OF ACE-WINDOW ------------
+
+;; ------------ START OF EMMS ------------
+(require 'emms)
+(emms-all)
+(setq emms-player-list '(emms-player-mpv
+                         emms-player-mplayer)
+      emms-info-functions '(emms-info-native))
+
+;; Start EMMS after Emacs init
+(add-hook 'after-init-hook #'(lambda ()
+                               (emms-add-directory "~/Music/")
+                               (emms-start)))
+
+;; ------------ END OF EMMS ------------
+
+
+;; ------------ START OF VTERM ------------
+
+(require 'vterm)
