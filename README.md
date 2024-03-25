@@ -2,11 +2,11 @@
 The Emacs config that I use for when I use Emacs.
 
 # PREQUISITE
+You must have Emacs (obviously)<br>
+After you paste my init.el contents onto your .emacs or init.el file or downloading it and having it as your init.el file. Do the following<br>
 ```
-You must have Emacs (obviously)
-After you paste my init.el contents onto your .emacs or init.el file or downloading it and having it as your init.el file. Do the following
 
-1.  refresh-contents inside your init.el file (M-x <RET> package-refresh-contents <RET>)
+1.  M-x <RET> package-refresh-contents <RET>
 1.5 If that does not prompt the install then do M-x <RET> package-install-selected-packages <RET>
 
 -- This package use all-the-icons so once you refresh don't forget to do
