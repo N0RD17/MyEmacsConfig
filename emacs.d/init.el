@@ -12,7 +12,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(vterm eglot emms company-jedi lsp-jedi lsp-ui lsp-java lsp-mode spacemacs-theme dashboard treemacs-nerd-icons treemacs-magit treemacs-projectile treemacs org-bullets flycheck-projectile counsel-projectile projectile nerd-icons-ivy-rich all-the-icons ivy-rich doom-modeline ivy yasnippet company)))
+   '(multiple-cursors emms treemacs-nerd-icons treemacs-magit magit doom-modeline nerd-icons-ivy-rich ivy-rich counsel-projectile counsel swiper lsp-ivy org-superstar toc-org dap-mode lsp-treemacs lsp-ui company-jedi lsp-jedi lsp-mode dashboard nerd-icons all-the-icons doom-themes)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -21,7 +21,7 @@
  )
 
 ;; Only if its GUI do this
-(when window-system
+(when (display-graphic-p)
   (tool-bar-mode 0)	;; Disable the tool-bar
   (tooltip-mode 0))	;; Disable the tool-tips
 
@@ -29,8 +29,22 @@
 ;; Initializes hs-minor-mode when emacs detects any program mode hook
 (add-hook 'prog-mode-hook (lambda () (hs-minor-mode 1)))
 
-;; Makes backups emacs file be saved in .emacs.d/emacs_saves
-(setq backup-directory-alist '(("." . "~/.emacs.d/.backup_saves")))
+;; Make backups be saved in .emacs.d/emacs_saves and ensure the directory exists
+(let ((backup-dir (expand-file-name "~/.emacs.d/.backup_saves")))
+  (unless (file-exists-p backup-dir)
+    (make-directory backup-dir t))
+  (setq backup-directory-alist `(("." . ,backup-dir))))
+
+;; Don't clutter the backup directory
+(setq delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t)  ; Use version numbers for backups
+;; Increase the time allowed between key sequences
+(setq echo-keystrokes 0.5)
+
+;; Set the Font I want Emacs to use
+(set-frame-font "JetBrainsMono Nerd Font Medium 10" nil t)
 
 ;; ------------ Better Defaults ------------
 (setq-default
@@ -51,10 +65,10 @@
  select-enable-clipboard t                        ; Merge system's and Emacs' clipboard
  sentence-end-double-space nil                    ; End a sentence after a dot and a space
  show-help-function nil                           ; Disable help messages
-;; show-trailing-whitespace t                       ; Display trailing whitespaces
+ ;; show-trailing-whitespace t                    ; Display trailing whitespaces
  split-height-threshold nil                       ; Disable vertical window splitting
  split-width-threshold nil                        ; Disable horizontal window splitting
-;; tab-width 4                                      ; Set width for tabs
+ ;; tab-width 4                                   ; Set width for tabs
  uniquify-buffer-name-style 'forward              ; Uniquify buffer names
  window-combination-resize t                      ; Resize windows proportionally
  x-stretch-cursor t                               ; Stretch cursor to the glyph width
@@ -84,157 +98,254 @@
 (put 'upcase-region 'disabled nil)                ; Enable upcase-region
 (show-paren-mode 1)                               ; Highlight matching parenthesis
 (global-hl-line-mode 1)                           ; Highlight the line you're on
-
-
+(global-set-key (kbd "<f4>") 'undo)               ; Better undo than (C-x u)
 
 ;; ------------ END OF Better Defaults ------------
 
+;; ------------ START OF EMACS THEME ------------
 ;; Loads spacemacs theme
-(load-theme 'spacemacs-dark t)
+;;(load-theme 'spacemacs-dark t) ;; I don't like it anymore.
+;; If I ever want to use DOOM EMACS themes
+;;(require 'doom-themes)
+(use-package doom-themes
+  :ensure t
+  :config (load-theme 'doom-one t)
+  )
+;;  :init (load-theme 'doom-miramare t)
+;;(load-theme 'leuven-dark t)
+;;(load-theme 'doom-nord t)
+;;(load-theme 'doom-city-lights t)
+;;(load-theme 'doom-gruvbox t)
+
+;; Gruvbox whenever needed
+
+;; ------------ END OF EMACS THEME ------------
 
 ;; ------------ START OF ICONS ------------
 
-(require 'all-the-icons)
-(require 'nerd-icons)
+(use-package all-the-icons
+  :ensure t
+  )
+
+(use-package nerd-icons
+  :ensure t
+  )
 
 ;; ------------ END OF ICONS ------------
 
+
 ;; ------------ DASHBOARD AND ITS CONFIGURATIONS ------------
-(require 'dashboard)
-(dashboard-setup-startup-hook)
-(setq dashboard-set-heading-icons t)
-;; Use this package
-(setq dashboard-icon-type 'all-the-icons)
-
-(setq dashboard-heading-icons '((recents . "history")
-                                (bookmarks . "bookmark")
-                                (projects . "rocket")))
-
-;; Set the title
-(setq dashboard-banner-logo-title "Hello, good hunter, what is it you desire?")
-
-;; Set the banner
-(setq dashboard-startup-banner "~/.emacs.d/images/bloodborne/Bloodborne-HunterDream-2-Scaled.png")
-
-(setq dashboard-footer-messages '("I am a doll, here in this dream to look after you."
-                                  "Honorable hunter, pursue the echoes of blood
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook)
+  (setq dashboard-set-heading-icons t
+        dashboard-icon-type 'all-the-icons
+        dashboard-heading-icons '((recents . "history")
+                                  (bookmarks . "bookmark")
+                                  (projects . "rocket"))
+        dashboard-banner-logo-title "Hello, good hunter, what is it you desire?"
+        dashboard-startup-banner "~/.emacs.d/images/bloodborne/Bloodborne-HunterDream-2-Scaled.png"
+        dashboard-footer-messages '("I am a doll, here in this dream to look after you."
+                                    "Honorable hunter, pursue the echoes of blood
 and I will channel them into your strength."
-                                  "You will hunt beasts and I will be here for you,
+                                    "You will hunt beasts and I will be here for you,
 to embolden your sickly spirit."
-                                  "Over time, countless hunters have visited this dream.
+                                    "Over time, countless hunters have visited this dream.
 The graves here stand in their memory... it all seems, so long ago now."
-                                  "Hunters have told me about the Church,
+                                    "Hunters have told me about the Church,
 about the Gods and their love. But do Gods love their creations.
 I am a doll created by you humans, would you ever think to love me?
 Of course, I do love you, isn't that how you've made me?"
-                                  "O flora, of the moon, of the dream. O little ones, O fleeting will of the ancients.
+                                    "O flora, of the moon, of the dream. O little ones, O fleeting will of the ancients.
 Let the hunter be safe, let them find comfort. And let this dream, their captor,
-foretell a pleasant awakening. Be one day, a fond, distant memory."))
-
-
-
-;; Add widgets to display
-(setq dashboard-items '((recents . 5)
-                        (bookmarks . 5)
-                        (projects . 5)))
-
-;; To modify widget heading name
-(setq dashboard-item-names '(("Recent Files:" . "Recently opened files:")))
-
-;; Show navigator below the banner
-(setq dashboard-set-navigator t)
-
-;; Format: "(icon title help action face prefix suffix)"
-(setq dashboard-navigator-buttons
-      `(;; line1
-        ((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
-         "Homepage"
-         "Browse homepage"
-         (lambda (&rest _) (browse-url "github.com"))))))
+foretell a pleasant awakening. Be one day, a fond, distant memory.")
+        ;; Add widgets to display
+        dashboard-items '((recents . 5) 
+                          (bookmarks . 5)
+                          (projects . 5))
+        ;; To modify widget heading name
+        dashboard-item-names '(("Recent Files:" . "Recently opened files:"))
+        ;; Show navigator below the banner
+        dashboard-set-navigator t
+        ;; Format: "(icon title help action face prefix suffix)"
+        dashboard-navigator-buttons
+	`(((,(all-the-icons-octicon "mark-github" :height 1.1 :v-adjust 0.0)
+            "Homepage"
+            "Browse homepage"
+            (lambda (&rest _) (browse-url "github.com")))))))
 
 ;; ------------ END OF DASHBOARD AND ITS CONFIGURATIONS ------------
 
 
-(require 'company)
-(add-hook 'after-init-hook 'global-company-mode)
+;; ------------ START OF LSP MODE ------------
 
-;; Enables yasnippet
-(require 'yasnippet)
-(yas-global-mode 1)
+(use-package lsp-mode
+  :ensure t
+  :init
+  (setq lsp-keymap-prefix "C-c l") ;; Optional: Change prefix for lsp-mode keybindings
+  :hook (
+         (c-mode . lsp)
+         (c++-mode . lsp)
+         (python-mode . lsp)
+         (shell-script-mode)
+         )
+  :commands lsp)
 
-;; c-mode and c++-mode Indentation
-(setq c-default-style '((c++-mode . "ellemtel") (c-mode . "ellemtel")))
-(setq-default indent-tabs-mode nil)
+(use-package company
+  :ensure t
+  :init
+  (global-company-mode)  ;; Enable company-mode globally
+  :config
+  (setq company-minimum-prefix-length 1  ;; Start completion after 1 character
+        company-idle-delay 0.0))        ;; Show completions instantly
 
-(require 'eglot)
-(with-eval-after-load 'eglot
-  (require 'flycheck)
-  (require 'flycheck-projectile)
-  (require 'flycheck-eglot)
-  (global-flycheck-eglot-mode 1))
-  
+
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode
+  :config
+  (setq lsp-ui-doc-enable t
+        lsp-ui-doc-position 'at-point
+        lsp-ui-sideline-enable t))
+
+
+(use-package dap-mode
+  :ensure t
+  :config
+  (dap-auto-configure-mode))
+
+(global-set-key [f7] 'lsp-find-declaration)
+
+;; ------------ END OF LSP MODE ------------
 
 ;; ------------ START OF C-C++ MODE THINGS ------------
 
 ;; c-mode and c++-mode Indentation
-(setq c-default-style '((c++-mode . "ellemtel") (c-mode . "ellemtel")))
-(setq-default indent-tabs-mode nil)
+;; (setq c-default-style '((c++-mode . "stroustrup") (c-mode . "stroustrup")))
+  ;; Auto insert C/C++ header
+(define-auto-insert
+  (cons "\\.\\([Hh]\\|hh\\|hpp\\)\\'" "My C / C++ header")
+  '(nil
+    "// " (file-name-nondirectory buffer-file-name) "\n"
+    "//\n"
+    "// Description:\n"
+    "//\n"
+    (make-string 70 ?/) "\n\n"
+    (let* ((noext (substring buffer-file-name 0 (match-beginning 0)))
+    	   (nopath (file-name-nondirectory noext))
+    	   (ident (concat (upcase nopath) "_H")))
+      (concat "#ifndef " ident "\n"
+    	      "#define " ident  " \n\n\n"
+    	      "\n\n#endif /* " ident " */\n"))))
+(global-set-key [f12] 'auto-insert)
 
-(with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
-  (add-hook 'c-mode-hook 'eglot-ensure)
-  (add-hook 'c++-mode-hook 'eglot-ensure)
-  ;; Stops eglot form automatically inserting headers
-  (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd" "--header-insertion=never"))))
+;; Stops LSP from annoyingly reformating to how it wants
+(setq lsp-enable-on-type-formatting nil)
+(setq lsp-enable-indentation nil)
+
+(setq c-default-style '((c++-mode . "ellemtel") (c-mode . "ellemtel")))
+;;(setq-default indent-tabs-mode nil)
+;;(setq-default tab-width 4)
+(setq c-basic-offset 4) ;; Sets Indentation of C functions to 4 instead of ellemtel's 3
+;;(setq indent-line-function 'insert-tab)
+
 
 ;; ------------ END OF C-C++ MODE THINGS ------------
 
-;; ------------ START OF JAVA MODE THINGS ------------
-
-(require 'lsp-mode)
-(with-eval-after-load 'lsp-mode
-  (add-hook 'java-mode-hook 'lsp)
-  (setq lsp-ui-doc-show-with-cursor t))
-
-;; ------------ END OF JAVA MODE THINGS ------------
-
 ;; ------------ START OF PYTHON MODE THINGS ------------
-(require 'lsp-jedi)
-(require 'company-jedi)
-(with-eval-after-load 'lsp-mode
-  (add-hook 'python-mode-hook 'lsp)
-  (setq lsp-ui-doc-show-with-cursor t))
+
+(use-package lsp-jedi
+  :after lsp-mode
+  :ensure t
+  :init
+  (setq lsp-jedi-server-command '("jedi-language-server"))
+  :hook (python-mode . (lambda()
+                         (require 'lsp-jedi)
+                         (lsp))) ; Use lsp-jedi for Python
+  )
+
+(use-package company-jedi
+  :after (lsp-jedi company)
+  :ensure t
+  :config
+  (add-to-list 'company-backends 'company-jedi)) ; Add company-jedi to company backends
+
 ;; ------------ END OF PYTHON MODE THINGS ------------
+
+;; ------------ START OF BASH/SHELLSCRIPT MODE ------------
+
+;; After lsp-mode loads, setup a new lsp connection that activates on shellscript mode
+;; This connection requires bash-language-server package.
+(with-eval-after-load 'lsp-mode
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection '("bash-language-server" "start"))
+                    :activation-fn (lsp-activate-on "shellscript")
+                    :priority -1
+                    :environment-fn (lambda ()
+                                      '(("EXPLAINSHELL_ENDPOINT" . lsp-bash-explainshell-endpoint)
+                                        ("HIGHLIGHT_PARSING_ERRORS" . lsp-bash-highlight-parsing-errors)))
+                    :server-id 'bash-ls))
+  )
+
+;; ------------ END OF BASH/SHELLSCRIPT MODE ------------
 
 ;; ------------ BEGIN DOOM-MODELINE ------------
 ;; Enable doom-modeline
-(require 'doom-modeline)
-(add-hook 'after-init-hook 'doom-modeline-mode)
+;;(require 'doom-modeline)
+(use-package doom-modeline
+  :ensure t
+  :hook (after-init . doom-modeline-mode))
+;;(add-hook 'after-init-hook 'doom-modeline-mode)
 ;;(doom-modeline-mode 1) ;; I prefer initializing after init
 
 ;; ------------ END OF DOOM-MODELINE ------------
 
+
 ;; ------------ START OF ORG-STUFF ------------
-(require 'org-bullets)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+(use-package org
+  :ensure t
+  :hook (org-mode . org-indent-mode))
+
+(use-package toc-org
+  :after org
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook 'toc-org-enable))
+
+(use-package org-superstar
+  :after org
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
+
+;;(require 'org)
+;;(add-hook 'org-mode-hook 'org-indent-mode 1)
+;;(require 'toc-org)
+;;(add-hook 'org-mode-hook 'toc-org-enable)
+;;(require 'org-superstar)
+;;(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+;; Outdated so I use org-superstar now
+;;(require 'org-bullets)
+;;(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
 ;; ------------ END OF ORG-STUFF ------------
 
 ;; ------------ START OF IVY ------------
-(require 'ivy)
+
 ;; Prevents the recentf warnings and errors
 (require 'recentf)
 (recentf-mode 1)
+
 (require 'projectile)
-(with-eval-after-load 'ivy
-  (require 'counsel)
-  (require 'counsel-projectile)
-  (ivy-mode 1)
-  (setq projectile-completion-system 'ivy)
-  (counsel-projectile-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t)
-  (global-set-key "\C-s" 'swiper)
+
+(use-package lsp-ivy
+  :ensure t
+  :config (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t
+        enable-recursive-minibuffers t)
+  (global-set-key (kbd "C-s") 'swiper)
   (global-set-key (kbd "C-c C-r") 'ivy-resume)
   (global-set-key (kbd "<f6>") 'ivy-resume)
   (global-set-key (kbd "M-x") 'counsel-M-x)
@@ -250,52 +361,105 @@ foretell a pleasant awakening. Be one day, a fond, distant memory."))
   (global-set-key (kbd "C-c k") 'counsel-ag)
   (global-set-key (kbd "C-x l") 'counsel-locate)
   (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+  )
 
+(use-package counsel
+  :after (lsp-ivy)
+  :ensure t
+  )
+
+(use-package counsel-projectile
+  :after (counsel projectile)
+  :ensure t
+  :config
+  (setq projectile-completion-system 'ivy-lsp)
+  (counsel-projectile-mode 1)
+  )
 
 ;; Ivy-Rich
 ;; Enables nerd-icons before ivy-rich-mode for better performance
 ;; Enable other packages like counsel-projectile before enabling
 ;; nerd-icons-ivy-rich-mode
-(require 'nerd-icons-ivy-rich)
-(require 'ivy-rich)
-(nerd-icons-ivy-rich-mode 1)
-(ivy-rich-mode 1)
-(setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+(use-package nerd-icons-ivy-rich
+  :after counsel-projectile
+  :ensure t
+  :config (nerd-icons-ivy-rich-mode 1)
+  )
 
-;; ------------ END OF IVY ------------
+(use-package ivy-rich
+  :ensure t
+  :after nerd-icons-ivy-rich
+  :config
+  (ivy-rich-mode 1)
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+  )
+
+;; ;; ------------ END OF IVY ------------
 
 ;; ------------ START OF TREEMACS ------------
 ;; Treemacs, Treemacs-Projectile, Treemacs-Magit, Treemacs-nerds-icons
-(require 'treemacs)
-(require 'treemacs-projectile)
-(require 'treemacs-magit)
-(require 'treemacs-nerd-icons)
+
+(use-package lsp-treemacs
+  :ensure t
+  :config
+  (setq treemacs-indent-guide-style 'line)
+  (treemacs-indent-guide-mode)
+  (treemacs-git-mode 'deferred)
+
+  (treemacs-git-commit-diff-mode)
+  :bind ("<f5>" . treemacs-select-window)
+  :commands lsp-treemacs-errors-list)
+
+(use-package treemacs-projectile
+  :after (lsp-treemacs projectile)
+  :ensure t
+  )
+(use-package treemacs-magit
+  :after (lsp-treemacs magit)
+  :ensure t
+  )
+(use-package treemacs-nerd-icons
+  :after (lsp-treemacs nerd-icons)
+  :ensure t
+  )
+
+;;(global-set-key (kbd "<f5>") 'treemacs-select-window)
 ;; ------------ END OF TREEMACS ------------
+
+;; ------------ START OF LSP-TREEMACS ------------
+;; ...  Can't find a reason to do something here
+;; ------------ END OF LSP-TREEMACS ------------
 
 ;; ------------ START OF ACE-WINDOW ------------
 ;; TREEMACS comes with Ace-Window preinstalled as a depedency!
-(require 'ace-window)
+(use-package ace-window
+  :ensure t
+  :bind ("C-x o" . ace-window))
 
-(global-set-key (kbd "C-x o") 'ace-window)
+;;(global-set-key (kbd "C-x o") 'ace-window)
 
 ;; ------------ END OF ACE-WINDOW ------------
 
 ;; ------------ START OF EMMS ------------
-(require 'emms)
-(emms-all)
-(setq emms-player-list '(emms-player-mpv
-                         emms-player-mplayer)
-      emms-info-functions '(emms-info-native))
-
-;; Start EMMS after Emacs init
-(add-hook 'after-init-hook #'(lambda ()
-                               (emms-add-directory "~/Music/")
-                               (emms-start)))
-
+(use-package emms
+  :ensure t
+  :config
+  (emms-all)
+  (setq emms-player-list '(emms-player-mpv
+                           emms-player-mplayer)
+        emms-info-functions '(emms-info-native))
+  ;; Start EMMS after Emacs init
+  :hook (after-init . (lambda ()
+                        (emms-add-directory "~/Music/")
+                        (emms-play-file "~/Music/Bloodborne_Soundtrack_OST___Moonlit_Melody.mp3"))))
 ;; ------------ END OF EMMS ------------
 
+;; ------------ START OF MULTIPLE-CURSORS ------------
 
-;; ------------ START OF VTERM ------------
+(use-package multiple-cursors
+  :ensure t
+  :config (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+  )
 
-(require 'vterm)
+;; ------------ END OF MULTIPLE-CURSORS ------------
