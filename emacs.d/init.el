@@ -397,7 +397,7 @@ foretell a pleasant awakening. Be one day, a fond, distant memory.")
 
 ;; ;; ------------ END OF IVY ------------
 
-;; ------------ START OF TREEMACS ------------
+;; ------------ START OF LSP-TREEMACS ------------
 ;; Treemacs, Treemacs-Projectile, Treemacs-Magit, Treemacs-nerds-icons
 
 (use-package lsp-treemacs
@@ -426,10 +426,6 @@ foretell a pleasant awakening. Be one day, a fond, distant memory.")
 
 ;;(global-set-key (kbd "<f5>") 'treemacs-select-window)
 ;; ------------ END OF TREEMACS ------------
-
-;; ------------ START OF LSP-TREEMACS ------------
-;; ...  Can't find a reason to do something here
-;; ------------ END OF LSP-TREEMACS ------------
 
 ;; ------------ START OF ACE-WINDOW ------------
 ;; TREEMACS comes with Ace-Window preinstalled as a depedency!
